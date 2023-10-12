@@ -28,11 +28,28 @@ type LoginResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+// swagger input
+type UserDetails struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 // Signup is a function that handles user signup
-// It takes in a gin context as an argument and binds the user data from request body to a user struct
-// It then hashes the user's password and created a user record in the database
+// It takes in a gin context as an argument and binds the user data from the request body to a user struct
+// It then hashes the user's password and creates a user record in the database
 // If successful, it returns a 200 status code with a success message
-// If unSuccessful, it returns a 400 or 500 status code with an error message
+// If unsuccessful, it returns a 400 or 500 status code with an error message
+
+// @Summary Signup User
+// @Description Signin
+// @ID SignupUser
+// @Tags User
+// @Param EnterDetails body UserDetails true "Signin"
+// @Accept json
+// @Success 200 {object} string "Success"
+// @Failure 400 {string} string "Error"
+// @Router /public/signup [POST]
 func (ctrl UserController) Signup(c *gin.Context) {
 	var user models.User
 	err := c.ShouldBindJSON(&user)
@@ -64,6 +81,16 @@ func (ctrl UserController) Signup(c *gin.Context) {
 // It then checks if the user exists in the database and if the password is correct
 // If successful, it generates a token and a refresh token and returns a 200 status code with the token and refresh token
 // If unsuccessful, it returns a 401 or 500 status code with an error message
+
+// @Summary Login User
+// @Description  Login
+// @Tags User
+// @ID LoginUser
+// @Param EnterDetails body LoginPayload true "Login"
+// @Accept json
+// @Success 200  {object}  string  "Success"
+// @Failure 400  {string}  string  "Error"
+// @Router /public/login [POST]
 func (ctrl UserController) Login(c *gin.Context) {
 	var payload LoginPayload
 	var user models.User
@@ -89,7 +116,7 @@ func (ctrl UserController) Login(c *gin.Context) {
 	jwtWrapper := auth.JwtWrapper{
 		SecretKey:         "verysecretkey",
 		Issuer:            "AuthService",
-		ExpirationMinutes: 1,
+		ExpirationMinutes: 120,
 		ExpirationHours:   12,
 	}
 	signedToken, err := jwtWrapper.GenerateToken(user.Email)
@@ -121,6 +148,16 @@ func (ctrl UserController) Login(c *gin.Context) {
 // based on the email provided in the authorization middleware.
 // It returns a 404 status code if the user is not found,
 // and a 500 status code if an error occurs while retrieving the user profile.
+
+// @Summary Get User By Token
+// @ID GetUserByToken
+// @Produce json
+// @Tags User
+// Param [param_name] [param_type] [data_type] [required/mandatory] [description]
+// @Param Authorization header string true "Authorization header using the Bearer scheme"
+// @Success 200 {object} string "Success"
+// @Failure 400 {string} string "Error"
+// @Router /protected/profile [GET]
 func (ctrl UserController) Profile(c *gin.Context) {
 	// Initialize a user model
 	var user models.User
