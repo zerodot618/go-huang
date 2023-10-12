@@ -11,6 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserController is a struct that represents a controller for user-related operations
+type UserController struct{}
+
 // LoginPayload login body
 // LoginPayload is a struct that contains the fields for a user's login credentials
 type LoginPayload struct {
@@ -30,7 +33,7 @@ type LoginResponse struct {
 // It then hashes the user's password and created a user record in the database
 // If successful, it returns a 200 status code with a success message
 // If unSuccessful, it returns a 400 or 500 status code with an error message
-func Signup(c *gin.Context) {
+func (ctrl UserController) Signup(c *gin.Context) {
 	var user models.User
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
@@ -61,7 +64,7 @@ func Signup(c *gin.Context) {
 // It then checks if the user exists in the database and if the password is correct
 // If successful, it generates a token and a refresh token and returns a 200 status code with the token and refresh token
 // If unsuccessful, it returns a 401 or 500 status code with an error message
-func Login(c *gin.Context) {
+func (ctrl UserController) Login(c *gin.Context) {
 	var payload LoginPayload
 	var user models.User
 	err := c.ShouldBindJSON(&payload)
@@ -112,4 +115,33 @@ func Login(c *gin.Context) {
 		RefreshToken: signedtoken,
 	}
 	c.JSON(200, tokenResponse)
+}
+
+// Profile is a controller function that retrieves the user profile from the database
+// based on the email provided in the authorization middleware.
+// It returns a 404 status code if the user is not found,
+// and a 500 status code if an error occurs while retrieving the user profile.
+func (ctrl UserController) Profile(c *gin.Context) {
+	// Initialize a user model
+	var user models.User
+	// Get the eamil from the authorization middleware
+	email, _ := c.Get("email")
+	// Query the database for the user
+	result := database.GlobalDB.Where("email = ?", email.(string)).First(&user)
+	// If the user is not found, return a 404 status code
+	if result.Error == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusNotFound, gin.H{"Error": "User Not Found"})
+		c.Abort()
+		return
+	}
+	// If an error occurs while retriving the user profile, return a 500 status code
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": "Could Not Get User Profile"})
+		c.Abort()
+		return
+	}
+	// Set the user's password to an empty string
+	user.Password = ""
+	// Return the user profile with a 200 status code
+	c.JSON(http.StatusOK, user)
 }
