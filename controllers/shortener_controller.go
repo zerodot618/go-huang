@@ -8,6 +8,7 @@ import (
 	"github.com/zerodot618/go-huang/models"
 )
 
+// ShortenerController is a struct that represents a controller for shortener-related operations``
 type ShortenerController struct{}
 
 // CreateShortURl creates a short URL from a long URL and stores it in the database

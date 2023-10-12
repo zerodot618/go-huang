@@ -24,6 +24,7 @@ func SetupRouter() *gin.Engine {
 		setupUserRoutes(api)
 		setupBookRoutes(api)
 		setupShortenerRoutes(api)
+		setupFileRoutes(api)
 	}
 	// Return the router
 	return r

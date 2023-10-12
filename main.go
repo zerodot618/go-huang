@@ -41,6 +41,8 @@ func main() {
 	// AutoMigrate() automatically migrates our schema, to keep our schema upto date.
 	database.GlobalDB.AutoMigrate(&models.User{})
 	database.GlobalDB.AutoMigrate(&models.Book{})
+	database.GlobalDB.AutoMigrate(&models.URL{})
+	database.GlobalDB.AutoMigrate(&models.File{})
 	// Set up the router
 	r := routes.SetupRouter()
 	// Start the server
