@@ -23,6 +23,7 @@ func SetupRouter() *gin.Engine {
 		// Add the routes for the user
 		setupUserRoutes(api)
 		setupBookRoutes(api)
+		setupShortenerRoutes(api)
 	}
 	// Return the router
 	return r
