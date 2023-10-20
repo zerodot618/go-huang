@@ -3,6 +3,7 @@ module github.com/zerodot618/go-huang
 go 1.20
 
 require (
+	github.com/badoux/checkmail v1.2.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.3.1
